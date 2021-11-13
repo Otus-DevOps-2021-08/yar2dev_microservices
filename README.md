@@ -4,7 +4,7 @@ yar2dev microservices repository
 
 
 # ДЗ 12 Технология контейнеризации. Введение в Docker
-Ecnfyj
+
 
 Установлен локальный Docker
 С помощью Docker machine создан Docker хост в YC.
