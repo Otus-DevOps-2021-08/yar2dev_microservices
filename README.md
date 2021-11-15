@@ -11,7 +11,7 @@ Mongo-db - база данных
 Post - сервис постов
 UI - веб интерфейс
 
-Сборка с поморщью команд:
+Сборка с помощью команд:
 docker build -t yar2dev/post:1.0 ./post-py
 docker build -t yar2dev/comment:1.0 ./comment
 docker build -t yar2dev/ui:1.0 ./ui
@@ -31,7 +31,7 @@ docker run -d --network=reddit -e COMMENT_DATABASE_HOST='comment_db_new' --netwo
 docker run -d --network=reddit -e COMMENT_SERVICE_HOST='comment_new' -e POST_SERVICE_HOST='post_new' -p 9292:9292 yar2dev/ui:1.0
 
 
-Контейнеры оптимизированны, к базе данных подключен volume reddit_db
+Контейнеры оптимизированы, к базе данных подключен volume reddit_db
 
 
 ![OTUS Tests](https://github.com/Otus-DevOps-2021-08/yar2dev_microservices/actions/workflows/runtests.yml/badge.svg)
