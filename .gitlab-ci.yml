@@ -48,9 +48,9 @@ staging:
   when: manual
   script:
     - echo 'Deploy'
-    environment:
-      name: beta
-      url: http://beta.example.com
+  environment:
+    name: beta
+    url: http://beta.example.com
 
 production:
   stage: production
