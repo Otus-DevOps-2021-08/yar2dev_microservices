@@ -57,7 +57,6 @@ branch review:
 
 staging:
   stage: stage
-  when: manual
   only:
     - /^\d+\.\d+\.\d+/
   script:
@@ -65,9 +64,6 @@ staging:
   environment:
     name: beta
     url: http://beta.example.com
-
-
-
 
 production:
   stage: production
