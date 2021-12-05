@@ -18,7 +18,7 @@
     restart: yes
 
 
-- name: Check all port numbers are accessible from the current host
+- name: Check ports are accessible from the current host
   wait_for:
     host: "{{ ansible_host }}"
     port: "{{ item }}"
