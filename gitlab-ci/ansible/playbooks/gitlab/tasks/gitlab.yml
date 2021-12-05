@@ -1,0 +1,41 @@
+---
+- name: gitlab-container
+  community.docker.docker_container:
+    name: gitlab
+    image: gitlab/gitlab-ce:latest
+    volumes:
+      - '/srv/gitlab/config:/etc/gitlab'
+      - '/srv/gitlab/logs:/var/log/gitlab'
+      - '/srv/gitlab/data:/var/opt/gitlab'
+    ports:
+      - '80:80'
+      - '443:443'
+      - '2222:22'
+    env:
+        GITLAB_OMNIBUS_CONFIG: external_url 'http://{{ ansible_host }}'
+
+    state: started
+    restart: yes
+
+
+- name: Check all port numbers are accessible from the current host
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: "{{ item }}"
+    state: started         # Port should be open
+    delay: 10               # No wait before first check (sec)
+    timeout: 300             # Stop checking after timeout (sec)
+  ignore_errors: yes
+  with_items:
+    - 80
+
+
+- name: Extract Runner Registration Token
+  community.docker.docker_container_exec:
+    container: gitlab
+    command: 'gitlab-rails runner -e production "puts Gitlab::CurrentSettings.current_application_settings.runners_registration_token"'
+  register: runner_registration_token
+
+- name: Print runner token
+  ansible.builtin.debug:
+    msg: runner{{ runner_registration_token }}

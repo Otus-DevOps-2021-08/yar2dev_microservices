@@ -1,0 +1,14 @@
+---
+- name: Extract init root password
+  community.docker.docker_container_exec:
+    container: gitlab
+    command: "grep 'Password:' /etc/gitlab/initial_root_password"
+  register: init_root_pass
+
+- name: get pass
+  set_fact:
+    root_pass: "{{ init_root_pass.stdout }}"
+
+- name: Print root init password
+  ansible.builtin.debug:
+    msg: Root {{ root_pass }}
