@@ -13,7 +13,6 @@
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
 
-
 - name: Add repo
   apt_repository:
     repo: deb [ arch=amd64,arm64 ] https://download.docker.com/linux/ubuntu bionic stable
@@ -39,3 +38,9 @@
     name: docker
     state: started
     enabled: yes
+- name: Add user to docker group
+  become: true
+  user:
+    name: "{{ansible_ssh_user}}"
+    groups: docker
+    append: yes

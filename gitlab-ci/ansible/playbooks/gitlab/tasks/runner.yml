@@ -5,6 +5,7 @@
     image: gitlab/gitlab-runner:latest
     restart: yes
     state: started
+    privileged: yes
     volumes:
       - /srv/gitlabrunner/config:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
@@ -23,5 +24,6 @@
     --registration-token {{ gitlab_runner_token }} \
     --executor docker \
     --docker-image alpine:latest \
+    --docker-privileged \
     --tag-list "linux,xenial,ubuntu,docker" \
     --run-untagged
