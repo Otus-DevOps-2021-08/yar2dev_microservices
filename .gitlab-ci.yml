@@ -9,15 +9,27 @@ stages:
 
 variables:
   DATABASE_URL: 'mongodb://mongo/user_posts'
+  DOCKER_TLS_CERTDIR: ""
 
-before_script:
-  - cd reddit
-  - bundle install
+.install:
+  before_script:
+    - cd reddit
+    - bundle install
+
+.docker:
+  image: docker:20.10.11
+  services:
+    - docker:dind
+  before_script:
+    - docker login --username $DOCKER_REGISTRY_USER --password $DOCKER_REGISTRY_PASS
 
 build_job:
+  extends: .docker
   stage: build
   script:
     - echo 'Building'
+    - docker build -t $DOCKER_USER/reddit:${CI_COMMIT_TAG} .
+    - docker push $DOCKER_USER/reddit:${CI_COMMIT_TAG}
 
 test_unit_job:
   stage: test
@@ -38,6 +50,7 @@ deploy_dev_job:
     url: http://dev.example.com
 
 test_unit_job:
+  extends: .install
   stage: test
   services:
     - mongo:latest
@@ -46,7 +59,9 @@ test_unit_job:
 
 branch review:
   stage: review
-  script: echo "Deploy to $CI_ENVIRONMENT_SLUG"
+  script:
+    - echo "Deploy to $CI_ENVIRONMENT_SLUG"
+    - docker run -d -p 9292:9292 $DOCKER_USER/reddit:${CI_COMMIT_TAG}
   environment:
     name: branch/$CI_COMMIT_REF_NAME
     url: http://$CI_ENVIRONMENT_SLUG.example.com
