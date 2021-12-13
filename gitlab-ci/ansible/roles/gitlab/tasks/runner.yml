@@ -1,4 +1,25 @@
 ---
+- name: Check ports are accessible from the current host
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: "{{ item }}"
+    state: started
+    delay: 10
+    timeout: 300
+  ignore_errors: yes
+  with_items:
+    - 80
+
+- name: Extract runner registration roken
+  community.docker.docker_container_exec:
+    container: gitlab
+    command: 'gitlab-rails runner -e production "puts Gitlab::CurrentSettings.current_application_settings.runners_registration_token"'
+  register: runner_registration_token
+
+- name: Print runner token
+  ansible.builtin.debug:
+    msg: runner{{ runner_registration_token }}
+
 - name: Create runner container
   community.docker.docker_container:
     name: gitlab-runner
@@ -10,7 +31,7 @@
       - /srv/gitlabrunner/config:/etc/gitlab-runner
       - /var/run/docker.sock:/var/run/docker.sock
 
-- name: set gitlab_runner_token
+- name: Set gitlab runner token
   set_fact:
     gitlab_runner_token: "{{ runner_registration_token.stdout }}"
 

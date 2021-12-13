@@ -5,7 +5,7 @@
     command: "grep 'Password:' /etc/gitlab/initial_root_password"
   register: init_root_pass
 
-- name: get pass
+- name: Get pass
   set_fact:
     root_pass: "{{ init_root_pass.stdout }}"
 
