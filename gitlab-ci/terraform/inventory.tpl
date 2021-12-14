@@ -1,0 +1,4 @@
+
+${jsonencode({
+  "gitlab": "${external-ip}",
+})}
