@@ -2,25 +2,24 @@
 yar2dev microservices repository
 
 
-# ДЗ 15 Устройство Gitlab CI. Построение процесса непрерывной поставки
+# ДЗ 16 Введение в мониторинг. Системы мониторинга.
 
-- Развернут Gitlab и Gitlab-runner в docker контейнерах
-- Определен CI/CD Пайплайн в файле .gitlab-ci.yml
-- Runner зарегистрирован по токену проекта
-- В Пайплайн добавлены тесты и окружения dev staging и production
-- Добавлено создание динамического окружение для для каждой ветки
-
-# *
-- Автоматизация развертывания GitLab & Автоматизация развёртывания GitLab Runner
-В папке gitlab-ci созданы папки terraform и ansible с ролями docker и gitlab.
-Для автоматичкского развертывания контейнеров с GitLab, GitLab-Runner
-и последующей автоматичской регистрацией shared-runner выполнить команду:
+- Запущен Prometeus в Docker контейнере
 ```sh
-cd terraform
-terraform apply
-```
-
-- Запуск reddit в контейнере
-Сборка reddit  и и запуск в контейнере осуществляется через dockerfile и .gitlab-ci.yml
+ docker run --rm -p 9090:9090 -d --name prometheus prom/prometheus
+ ```
+- Собран Docker образ Prometheus с файлом конфигурации
+в папке monitoring/prometheus/ создан Dockerfile и конфигурационный файл prometheus.yml
+- При помощи docker-compose.yml развернуты сервисы mongo post_py ui comment и prometheus
+```sh
+cd docker &&  docker-compose up -d
+ ```
+# *
+- В сервисы в docker-compose.yml и экспортеры в Prometheus: prom/node-exporter, percona/mongodb_exporter, prom/blackbox-exporter
+- Создан Makefile для сборки и пушинга образов в докер-хаб
+```sh
+make build
+make push
+ ```
 
 ![OTUS Tests](https://github.com/Otus-DevOps-2021-08/yar2dev_microservices/actions/workflows/runtests.yml/badge.svg)
