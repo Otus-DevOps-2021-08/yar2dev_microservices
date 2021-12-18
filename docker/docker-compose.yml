@@ -1,0 +1,101 @@
+version: '3.3'
+services:
+  post_db:
+    container_name: "${COMPOSE_PROJECT_NAME}_mongo"
+    image: mongo:3.2
+    volumes:
+      - post_db:/data/db
+    networks:
+      backend:
+        aliases:
+          - comment_db
+          - mongo_db
+
+  ui:
+    container_name: "${COMPOSE_PROJECT_NAME}_ui"
+    image: ${USER_NAME}/ui:${VER_UI}
+    ports:
+      - ${PORT_UI}:9292/tcp
+    networks:
+      - frontend
+  post:
+    container_name: "${COMPOSE_PROJECT_NAME}_post"
+    image: ${USER_NAME}/post:${VER_POST}
+    networks:
+      - backend
+      - frontend
+  comment:
+    container_name: "${COMPOSE_PROJECT_NAME}_comment"
+    image: ${USER_NAME}/comment:${VER_COMMENT}
+    networks:
+      - backend
+      - frontend
+
+  prometheus:
+    image: ${USER_NAME}/prometheus
+    ports:
+    - '9090:9090'
+    volumes:
+    - prometheus_data:/prometheus
+    command: # Передаем доп параметры в командной строке
+    - '--config.file=/etc/prometheus/prometheus.yml'
+    - '--storage.tsdb.path=/prometheus'
+    - '--storage.tsdb.retention=1d' # Задаем время хранения метрик в 1 день
+    networks:
+      - backend
+      - frontend
+
+  node-exporter:
+    image: prom/node-exporter:v0.15.2
+    user: root
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    networks:
+      - backend
+      - frontend
+
+  mongodb-exporter:
+    image: percona/mongodb_exporter:0.30.0
+    command:
+      - '--mongodb.uri=mongodb://mongo_db:27017'
+    networks:
+      - backend
+
+
+  blackbox-exporter:
+    image: ${USER_NAME}/blackbox-exporter
+    ports:
+    - '9115:9115'
+    command:
+      - '--config.file=/etc/blackbox_exporter/config.yml'
+    networks:
+      - backend
+      - frontend
+
+
+
+
+
+volumes:
+  post_db:
+  prometheus_data:
+
+networks:
+  frontend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.8.0/24
+  backend:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.0.7.0/24
