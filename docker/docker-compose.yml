@@ -16,70 +16,36 @@ services:
     image: ${USER_NAME}/ui:${VER_UI}
     ports:
       - ${PORT_UI}:9292/tcp
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.ui
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
     networks:
       - frontend
   post:
     container_name: "${COMPOSE_PROJECT_NAME}_post"
     image: ${USER_NAME}/post:${VER_POST}
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.post
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
     networks:
       - backend
       - frontend
   comment:
     container_name: "${COMPOSE_PROJECT_NAME}_comment"
     image: ${USER_NAME}/comment:${VER_COMMENT}
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
     networks:
       - backend
       - frontend
-
-  prometheus:
-    image: ${USER_NAME}/prometheus
-    ports:
-    - '9090:9090'
-    volumes:
-    - prometheus_data:/prometheus
-    command: # Передаем доп параметры в командной строке
-    - '--config.file=/etc/prometheus/prometheus.yml'
-    - '--storage.tsdb.path=/prometheus'
-    - '--storage.tsdb.retention=1d' # Задаем время хранения метрик в 1 день
-    networks:
-      - backend
-      - frontend
-
-  node-exporter:
-    image: prom/node-exporter:v0.15.2
-    user: root
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
-    networks:
-      - backend
-      - frontend
-
-  mongodb-exporter:
-    image: percona/mongodb_exporter:0.30.0
-    command:
-      - '--mongodb.uri=mongodb://mongo_db:27017'
-    networks:
-      - backend
-
-
-  blackbox-exporter:
-    image: ${USER_NAME}/blackbox-exporter
-    ports:
-    - '9115:9115'
-    command:
-      - '--config.file=/etc/blackbox_exporter/config.yml'
-    networks:
-      - backend
-      - frontend
-
-
-
 
 
 volumes:
