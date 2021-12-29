@@ -1,15 +1,13 @@
-FROM alpine:3.14
+FROM ruby:2.2
+RUN apt-get update -qq && apt-get install -y build-essential
 
 ENV APP_HOME /app
 RUN mkdir $APP_HOME
 WORKDIR $APP_HOME
+
 ADD Gemfile* $APP_HOME/
-ADD . $APP_HOME
-
-RUN apk add --no-cache --update ruby-full ruby-dev build-base \
-    && gem install bundler -v "$(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -n 1)"
 RUN bundle install
-
+ADD . $APP_HOME
 
 ENV COMMENT_DATABASE_HOST comment_db
 ENV COMMENT_DATABASE comments
