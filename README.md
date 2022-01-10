@@ -11,7 +11,7 @@ yar2dev microservices repository
 
 Установлен KS8s на двух нодах.
 # *
-Процесс установки кластера Л8Ы с двумя нодами описан при помощи Terraform и Ansible
+Процесс установки кластера KS8s с двумя нодами описан при помощи Terraform и Ansible
 Для установки использовать:
 > cd kubernetes/terraform && terraform apply
 
