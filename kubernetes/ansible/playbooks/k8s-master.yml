@@ -1,0 +1,44 @@
+---
+# file: k8s-master.yml
+- hosts: master
+  become: yes
+
+  tasks:
+    - name: init kuber
+      shell: |
+        kubeadm init --apiserver-cert-extra-sans={{ ansible_host }} --apiserver-advertise-address=0.0.0.0 --control-plane-endpoint={{ ansible_host }} --pod-network-cidr=10.244.0.0/16
+
+    - name: Create the 'kube' directory if it does not exist
+      become: yes
+      become_user: ubuntu
+      file:
+        path: $HOME/.kube
+        state: directory
+        mode: '0755'
+
+    - name: create kube config
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/ubuntu/.kube/config
+        owner: ubuntu
+        remote_src: yes
+
+    - name: get calico network driver
+      become_user: ubuntu
+      get_url:
+        url: https://docs.projectcalico.org/manifests/calico.yaml
+        dest: $HOME/calico.yaml
+        mode: '0440'
+
+    - name: modify calico yaml
+      become_user: ubuntu
+      shell: |
+        cat <<'EOF' | bash
+        sed -i -e 's?# - name: CALICO_IPV4POOL_CIDR?- name: CALICO_IPV4POOL_CIDR?g' $HOME/calico.yaml
+        sed -i -e 's?#   value: "192.168.0.0/16"?  value: "10.244.0.0/16"?g' $HOME/calico.yaml
+        EOF
+
+    - name: apply calico
+      become_user: ubuntu
+      shell: |
+        sudo kubectl apply -f $HOME/calico.yaml
