@@ -41,7 +41,7 @@ yar2dev microservices repository
 >mongo-volume.yml
 3) Создан запрос на выдачу ресурса - PersistentVolumeClaim
 >mongo-claim.yml
-4)В деплоименте mongo в разделе volumes заменено
+4) В деплоименте mongo в разделе volumes заменено
 emptyDir: {}
 на
 persistentVolumeClaim:
