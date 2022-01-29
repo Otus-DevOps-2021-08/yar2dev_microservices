@@ -22,7 +22,7 @@ yar2dev microservices repository
   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=1.2.3.4"
   kubectl create secret tls ui-ingress --key tls.key --cert tls.crt -n dev
 
-Созданы сетевые политики Calico (reddit-network-policy.yml)
+Созданы сетевые политики Calico (mongo-network-policy.yml)
 по принципу все запрещено, что не разрешено явно.
 - по умолчанию запрещен весь входящий трафик
 - разрешен к mongo от comment и post
@@ -38,9 +38,9 @@ yar2dev microservices repository
  --description "disk for k8s"
 
 2) Создан ресурс дискового хранилища в виде PersistentVolume
->mongo-pv.yml
+>mongo-volume.yml
 3) Создан запрос на выдачу ресурса - PersistentVolumeClaim
->mongo-pvc.yml
+>mongo-claim.yml
 4)В деплоименте mongo в разделе volumes заменено
 emptyDir: {}
 на
